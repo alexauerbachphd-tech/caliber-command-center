@@ -1352,6 +1352,51 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* ============================================================
+   DAILY ACTION PLAN
+============================================================ */
+.daily-plan-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+.daily-plan-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.daily-plan-header h4 { margin: 0; color: var(--green); }
+.daily-progress { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+.daily-action {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.daily-action:last-child { border-bottom: none; }
+.daily-action input[type="checkbox"] {
+  margin-top: 0.2rem; accent-color: var(--green);
+  width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;
+  min-height: 44px; min-width: 44px;
+}
+.daily-action label { cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+.daily-action input:checked + label { text-decoration: line-through; color: var(--text-muted); }
+.da-category {
+  display: inline-block; font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 0.15rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;
+  vertical-align: middle;
+}
+.da-category.outreach { background: rgba(74,222,128,0.12); color: var(--green); }
+.da-category.product { background: rgba(96,165,250,0.12); color: var(--accent-blue); }
+.da-category.strategy { background: rgba(251,191,36,0.12); color: var(--warning); }
+.daily-plan-complete {
+  text-align: center; padding: 1rem;
+  color: var(--text-muted); font-size: 0.9rem;
+}
 </style>
 </head>
 <body>
@@ -5672,6 +5717,557 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     defense: 'Defense'
   };
 
+  // ========== 90-DAY DAILY ACTION PLAN ==========
+  var DAILY_PLAN_START = '2026-04-13';
+
+  var DAILY_PLAN = [
+    // WEEK 1 (Days 1-7, Apr 13-19): Foundation & First Outreach
+    { day: 1, actions: [
+      { text: 'Review Command Center war rooms — familiarize with all talking points for Construction and Healthcare', category: 'strategy' },
+      { text: 'Draft personal outreach list: 20 warm contacts across construction, healthcare, energy, and sports', category: 'outreach' },
+      { text: 'Finalize 48-hour assessment delivery workflow and document end-to-end process', category: 'product' }
+    ]},
+    { day: 2, actions: [
+      { text: 'Send personal emails to 5 warm network contacts in construction (use Construction email builder, Cold/CEO template)', category: 'outreach' },
+      { text: 'Set up CRM pipeline tracking — add all 20 warm contacts as prospects in Command Center', category: 'strategy' },
+      { text: 'Review and customize Construction Meeting Prep Card for your first calls', category: 'product' }
+    ]},
+    { day: 3, actions: [
+      { text: 'Send personal emails to 5 warm network contacts in healthcare (use Healthcare email builder)', category: 'outreach' },
+      { text: 'Prepare ROI calculator with real benchmarks for each vertical', category: 'product' },
+      { text: 'Update LinkedIn profile with Caliber positioning and assessment expertise', category: 'strategy' }
+    ]},
+    { day: 4, actions: [
+      { text: 'Send personal emails to 5 warm network contacts in energy sector', category: 'outreach' },
+      { text: 'Build one-pager template with real credentials and assessment methodology', category: 'product' },
+      { text: 'Set up email tracking system to monitor open rates and responses', category: 'strategy' }
+    ]},
+    { day: 5, actions: [
+      { text: 'Send personal emails to 5 warm contacts in sports and PE verticals', category: 'outreach' },
+      { text: 'Create 2-minute Caliber elevator pitch recording for practice and refinement', category: 'product' },
+      { text: 'Review and refine email sequences in Command Center for each vertical', category: 'strategy' }
+    ]},
+    { day: 6, actions: [
+      { text: 'Follow up on all 20 emails sent this week — personalized nudges to non-responders', category: 'outreach' },
+      { text: 'Draft first case study template from prior assessment work', category: 'product' },
+      { text: 'Plan Week 2 outreach targets — identify 10 cold construction and 10 cold healthcare targets', category: 'strategy' }
+    ]},
+    { day: 7, actions: [
+      { text: 'Review pipeline metrics — response rates, demos booked, conversion indicators', category: 'strategy' },
+      { text: 'Research 10 cold construction targets (PE-backed platforms, $50M+ revenue)', category: 'outreach' },
+      { text: 'Prepare for Monday demos — customize decks and talking points for confirmed calls', category: 'product' }
+    ]},
+
+    // WEEK 2 (Days 8-14, Apr 20-26): First Demos & Pipeline Building
+    { day: 8, actions: [
+      { text: 'Schedule 3 demos from warm responses — confirm times and send calendar invites', category: 'outreach' },
+      { text: 'Research 10 cold healthcare targets (regional health systems, 500+ employees)', category: 'strategy' },
+      { text: 'Build construction-specific pitch deck section with OSHA and safety ROI data', category: 'product' }
+    ]},
+    { day: 9, actions: [
+      { text: 'Conduct first demo — execute full assessment pitch with Q&A', category: 'outreach' },
+      { text: 'Send 5 cold emails to construction PE firms (use PE pitch from war rooms)', category: 'outreach' },
+      { text: 'Prepare customized one-pager for demo prospect based on their specific needs', category: 'product' }
+    ]},
+    { day: 10, actions: [
+      { text: 'Follow up on first demo with customized one-pager and next steps proposal', category: 'outreach' },
+      { text: 'Send 5 cold emails to healthcare CHROs (use Healthcare email builder)', category: 'outreach' },
+      { text: 'Refine assessment report template — add executive summary and visual formatting', category: 'product' }
+    ]},
+    { day: 11, actions: [
+      { text: 'Conduct second demo if scheduled — adapt pitch based on learnings from demo 1', category: 'outreach' },
+      { text: 'Send 5 cold construction emails targeting VP Safety and VP Operations', category: 'outreach' },
+      { text: 'Review OSHA compliance talking points and injury rate benchmarks for construction calls', category: 'strategy' }
+    ]},
+    { day: 12, actions: [
+      { text: 'Follow up on all pending demos — send personalized recaps within 24 hours', category: 'outreach' },
+      { text: 'Research 5 energy sector targets (utilities with NRC/NERC compliance needs)', category: 'strategy' },
+      { text: 'Draft pilot proposal template — $15K for 3 assessments over 30 days', category: 'product' }
+    ]},
+    { day: 13, actions: [
+      { text: 'Send pilot proposals to all interested prospects from demos this week', category: 'outreach' },
+      { text: 'Send 5 cold emails to healthcare VP Talent Acquisition targets', category: 'outreach' },
+      { text: 'Update pipeline board and risk scores for all active prospects', category: 'strategy' }
+    ]},
+    { day: 14, actions: [
+      { text: 'Review Week 2 results — demos conducted, proposals sent, pipeline growth rate', category: 'strategy' },
+      { text: 'Follow up on all outstanding cold emails from this week', category: 'outreach' },
+      { text: 'Adjust pitch deck and email templates based on demo feedback received', category: 'product' }
+    ]},
+
+    // WEEK 3 (Days 15-21, Apr 27 - May 3): Closing First Pilots
+    { day: 15, actions: [
+      { text: 'Follow up on all outstanding pilot proposals — offer to jump on a quick call to discuss', category: 'outreach' },
+      { text: 'Send 5 new cold emails to construction targets (VP HR, VP Talent)', category: 'outreach' },
+      { text: 'Finalize pilot contract terms and payment schedule — have ready for instant signing', category: 'product' }
+    ]},
+    { day: 16, actions: [
+      { text: 'Close first pilot (target) — send contract and schedule kickoff call', category: 'outreach' },
+      { text: 'Send 5 cold emails to energy sector CHROs and VP Nuclear Safety', category: 'outreach' },
+      { text: 'Begin assessment intake process for pilot 1 client — send questionnaire and schedule interviews', category: 'product' }
+    ]},
+    { day: 17, actions: [
+      { text: 'Deliver first assessment briefing call — walk client through findings and recommendations', category: 'product' },
+      { text: 'Follow up on 3 warm leads showing signs of going cold — personalized re-engagement', category: 'outreach' },
+      { text: 'Prepare Joint Commission compliance talking points for healthcare calls', category: 'strategy' }
+    ]},
+    { day: 18, actions: [
+      { text: 'Send 5 cold emails to healthcare VP Talent Acquisition and CHRO targets', category: 'outreach' },
+      { text: 'Work on second pilot assessment — complete intake and begin analysis', category: 'product' },
+      { text: 'Research 5 sports franchise targets (NBA, NFL, MLS front office leadership)', category: 'strategy' }
+    ]},
+    { day: 19, actions: [
+      { text: 'Follow up on all energy sector outreach — personalized messages referencing NRC compliance', category: 'outreach' },
+      { text: 'Deliver second assessment for pilot 1 client', category: 'product' },
+      { text: 'Draft construction case study from pilot 1 early results — focus on speed and quality', category: 'strategy' }
+    ]},
+    { day: 20, actions: [
+      { text: 'Close second pilot (target) — $30K cumulative revenue milestone', category: 'outreach' },
+      { text: 'Send 5 outreach emails to sports and PE contacts (use PE pitch template)', category: 'outreach' },
+      { text: 'Update all pipeline stages and risk scores — identify deals at risk of stalling', category: 'strategy' }
+    ]},
+    { day: 21, actions: [
+      { text: 'Review Week 3 results — pilots closed, assessments delivered, revenue booked vs $60K target', category: 'strategy' },
+      { text: 'Follow up on all proposals and demos from the past two weeks', category: 'outreach' },
+      { text: 'Refine assessment delivery workflow based on pilot 1 learnings', category: 'product' }
+    ]},
+
+    // WEEK 4 (Days 22-28, May 4-10): Pilot Delivery & Momentum
+    { day: 22, actions: [
+      { text: 'Deliver third assessment for pilot 1 — complete pilot deliverables', category: 'product' },
+      { text: 'Send follow-up emails to all contacted prospects who have not responded', category: 'outreach' },
+      { text: 'Request testimonial from pilot 1 client — provide template for easy completion', category: 'strategy' }
+    ]},
+    { day: 23, actions: [
+      { text: 'Send 5 cold emails to PE operating partners (use PE pitch from war rooms)', category: 'outreach' },
+      { text: 'Complete pilot 1 final assessment and compile results summary', category: 'product' },
+      { text: 'Draft pilot results summary document for use in future sales conversations', category: 'strategy' }
+    ]},
+    { day: 24, actions: [
+      { text: 'Close third pilot (target) — $45K cumulative revenue', category: 'outreach' },
+      { text: 'Follow up on healthcare demos — send customized case studies', category: 'outreach' },
+      { text: 'Prepare NRC/NERC compliance talking points for energy sector calls', category: 'strategy' }
+    ]},
+    { day: 25, actions: [
+      { text: 'Conduct energy sector demo — highlight compliance and safety assessment value', category: 'outreach' },
+      { text: 'Deliver first assessment for pilot 2 client', category: 'product' },
+      { text: 'Send 5 new construction outreach emails targeting larger firms ($100M+ revenue)', category: 'outreach' }
+    ]},
+    { day: 26, actions: [
+      { text: 'Follow up on all PE outreach — personalized messages about portfolio company value', category: 'outreach' },
+      { text: 'Deliver second assessment for pilot 2 client', category: 'product' },
+      { text: 'Collect first written testimonial and format for use in sales materials', category: 'strategy' }
+    ]},
+    { day: 27, actions: [
+      { text: 'Close fourth pilot (target) — $60K milestone achieved', category: 'outreach' },
+      { text: 'Send 5 new healthcare outreach emails to CMO and VP Quality targets', category: 'outreach' },
+      { text: 'Plan Days 31-60 strategy using Command Center 30/60/90 tab — set conversion targets', category: 'strategy' }
+    ]},
+    { day: 28, actions: [
+      { text: 'Review Month 1 results — $60K target check, 4 pilots status, pipeline health assessment', category: 'strategy' },
+      { text: 'Prep conversion conversation materials — Essentials tier ROI calculator and proposal', category: 'product' },
+      { text: 'Follow up on all outstanding proposals and schedule closing calls', category: 'outreach' }
+    ]},
+
+    // WEEK 5 (Days 29-35, May 11-17): Transition to Conversions
+    { day: 29, actions: [
+      { text: 'Begin Essentials conversion conversation with pilot 1 — show ROI from their 3 assessments', category: 'outreach' },
+      { text: 'Send 5 new cold emails to energy sector targets (VP Operations, Plant Managers)', category: 'outreach' },
+      { text: 'Update all case studies with pilot completion data and client quotes', category: 'product' }
+    ]},
+    { day: 30, actions: [
+      { text: 'Send Essentials upgrade proposal to pilot 1 — $60K/yr for 30 assessments', category: 'outreach' },
+      { text: 'Deliver final assessment for pilot 2 client', category: 'product' },
+      { text: 'Research 10 new healthcare targets (academic medical centers, large health systems)', category: 'strategy' }
+    ]},
+    { day: 31, actions: [
+      { text: 'Follow up on Essentials proposal with pilot 1 — address any objections', category: 'outreach' },
+      { text: 'Send 5 cold emails to construction targets (new batch — regional GCs and subcontractors)', category: 'outreach' },
+      { text: 'Begin assessment intake for pilot 3 client', category: 'product' }
+    ]},
+    { day: 32, actions: [
+      { text: 'Close first Essentials conversion with pilot 1 — $60K annual contract (target)', category: 'outreach' },
+      { text: 'Send 5 healthcare cold emails to CHRO and CNO targets at regional systems', category: 'outreach' },
+      { text: 'Prepare pilot 2 conversion pitch — customize ROI based on their assessment results', category: 'product' }
+    ]},
+    { day: 33, actions: [
+      { text: 'Begin Essentials conversation with pilot 2 — present their assessment ROI data', category: 'outreach' },
+      { text: 'Deliver assessment for pilot 3 client', category: 'product' },
+      { text: 'Send 5 PE operating partner emails — reference portfolio company assessment value', category: 'outreach' }
+    ]},
+    { day: 34, actions: [
+      { text: 'Close fifth pilot ($15K) — maintain new business pipeline while converting existing', category: 'outreach' },
+      { text: 'Follow up on all energy sector contacts — personalized check-ins', category: 'outreach' },
+      { text: 'Update Command Center pipeline and revenue tracker with all closed deals', category: 'strategy' }
+    ]},
+    { day: 35, actions: [
+      { text: 'Review Week 5 — Essentials conversions status, new pipeline additions, revenue run rate', category: 'strategy' },
+      { text: 'Follow up on pilot 2 Essentials proposal — push for decision this week', category: 'outreach' },
+      { text: 'Adjust outreach messaging based on what resonates most in demos and calls', category: 'product' }
+    ]},
+
+    // WEEK 6 (Days 36-42, May 18-24): Scale Outreach + Second Conversion
+    { day: 36, actions: [
+      { text: 'Close second Essentials conversion with pilot 2 (target) — $60K annual contract', category: 'outreach' },
+      { text: 'Send 5 cold emails to sports franchise Presidents of Business Operations', category: 'outreach' },
+      { text: 'Begin new pilot assessment delivery for most recent pilot client', category: 'product' }
+    ]},
+    { day: 37, actions: [
+      { text: 'Send 5 cold emails to construction targets (larger firms, $200M+ revenue)', category: 'outreach' },
+      { text: 'Deliver assessment for pilot 4 client', category: 'product' },
+      { text: 'Follow up on all PE contacts — nurture relationships for Q3 pipeline', category: 'outreach' }
+    ]},
+    { day: 38, actions: [
+      { text: 'Conduct 2 demos (construction + healthcare) — back-to-back if possible', category: 'outreach' },
+      { text: 'Prepare board-ready one-pagers for both demo prospects', category: 'product' },
+      { text: 'Update discovery question scripts based on successful demo patterns', category: 'strategy' }
+    ]},
+    { day: 39, actions: [
+      { text: 'Follow up on both demos with customized proposals and ROI projections', category: 'outreach' },
+      { text: 'Send 5 energy sector follow-up emails — reference recent industry compliance changes', category: 'outreach' },
+      { text: 'Work on new pilot assessment — maintain delivery quality while scaling', category: 'product' }
+    ]},
+    { day: 40, actions: [
+      { text: 'Close sixth pilot ($15K) — build momentum across multiple verticals', category: 'outreach' },
+      { text: 'Send 5 new healthcare outreach emails to VP Nursing and VP Medical Staff targets', category: 'outreach' },
+      { text: 'Collect second client testimonial — video if possible for website and pitch deck', category: 'strategy' }
+    ]},
+    { day: 41, actions: [
+      { text: 'Deliver 2 assessments — batch delivery to maintain efficiency at higher volume', category: 'product' },
+      { text: 'Follow up on all outstanding proposals — phone calls for deals over 7 days old', category: 'outreach' },
+      { text: 'Research conference and event opportunities for Q3 visibility and lead generation', category: 'strategy' }
+    ]},
+    { day: 42, actions: [
+      { text: 'Review Week 6 — revenue progress toward $160K cumulative, pipeline velocity, conversion rate', category: 'strategy' },
+      { text: 'Follow up on all Week 6 conversations and proposals', category: 'outreach' },
+      { text: 'Update case studies and testimonial library with latest client results', category: 'product' }
+    ]},
+
+    // WEEK 7 (Days 43-49, May 25-31): Deepening Relationships
+    { day: 43, actions: [
+      { text: 'Send 5 personalized follow-ups to warmest prospects (use Warm email template from war rooms)', category: 'outreach' },
+      { text: 'Deliver assessment for current pilot client', category: 'product' },
+      { text: 'Update case studies with latest results — add quantitative outcomes and client quotes', category: 'strategy' }
+    ]},
+    { day: 44, actions: [
+      { text: 'Conduct healthcare demo — emphasize Joint Commission compliance and patient safety', category: 'outreach' },
+      { text: 'Send 5 energy cold emails to VP Nuclear Operations and Plant Manager targets', category: 'outreach' },
+      { text: 'Prepare Professional upgrade pitch for Essentials client 1 — $120K/yr for 75 assessments', category: 'product' }
+    ]},
+    { day: 45, actions: [
+      { text: 'Follow up on healthcare demo with customized proposal and compliance ROI data', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Send 3 PE operating partner nurture emails — share assessment insights and case studies', category: 'outreach' }
+    ]},
+    { day: 46, actions: [
+      { text: 'Send 5 construction cold emails to new geographic region targets', category: 'outreach' },
+      { text: 'Schedule QBR with Essentials client 1 — prepare usage data and ROI presentation', category: 'strategy' },
+      { text: 'Work on assessment backlog — maintain 48-hour delivery SLA', category: 'product' }
+    ]},
+    { day: 47, actions: [
+      { text: 'Conduct QBR with Essentials client 1 — pitch Professional upgrade ($120K/yr)', category: 'outreach' },
+      { text: 'Send 5 sports franchise outreach emails — target GM and VP Player Personnel', category: 'outreach' },
+      { text: 'Update all pipeline stages, risk scores, and next action dates', category: 'strategy' }
+    ]},
+    { day: 48, actions: [
+      { text: 'Follow up on Professional upgrade conversation — send formal proposal to Essentials client 1', category: 'outreach' },
+      { text: 'Deliver 2 assessments — batch delivery day', category: 'product' },
+      { text: 'Draft energy sector case study highlighting compliance and safety assessment ROI', category: 'strategy' }
+    ]},
+    { day: 49, actions: [
+      { text: 'Review Week 7 — Essentials client health, Professional upgrade pipeline, cumulative assessments delivered', category: 'strategy' },
+      { text: 'Follow up on all outstanding proposals and demo follow-ups', category: 'outreach' },
+      { text: 'Plan Month 3 strategy — identify revenue gap and prioritize highest-probability deals', category: 'strategy' }
+    ]},
+
+    // WEEK 8 (Days 50-56, Jun 1-7): Pipeline Acceleration
+    { day: 50, actions: [
+      { text: 'Send 10 outreach emails across all verticals — batch outreach day for pipeline refresh', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Review and update all war room content with latest competitive intel and talking points', category: 'strategy' }
+    ]},
+    { day: 51, actions: [
+      { text: 'Conduct 2 demos — adapt pitch based on vertical and company size', category: 'outreach' },
+      { text: 'Prepare customized one-pagers for both demo prospects', category: 'product' },
+      { text: 'Follow up on Professional upgrade proposal with Essentials client 1', category: 'outreach' }
+    ]},
+    { day: 52, actions: [
+      { text: 'Follow up on both demos with proposals — include testimonials from similar companies', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Send 5 nurture emails to "not now" prospects — keep Caliber top of mind for Q3', category: 'outreach' }
+    ]},
+    { day: 53, actions: [
+      { text: 'Close seventh pilot ($15K) — maintain consistent new business flow', category: 'outreach' },
+      { text: 'Send 5 energy cold emails to new targets (renewable energy companies)', category: 'outreach' },
+      { text: 'Collect third client testimonial — focus on measurable outcomes', category: 'strategy' }
+    ]},
+    { day: 54, actions: [
+      { text: 'Deliver 2 assessments — batch delivery to maintain efficiency', category: 'product' },
+      { text: 'Follow up on all outstanding proposals — phone calls for stalled deals', category: 'outreach' },
+      { text: 'Update ROI calculators with real client data from completed assessments', category: 'strategy' }
+    ]},
+    { day: 55, actions: [
+      { text: 'Send 5 construction follow-up emails to warm pipeline prospects', category: 'outreach' },
+      { text: 'Begin Professional upgrade conversation with Essentials client 2', category: 'outreach' },
+      { text: 'Work on assessment for current client — maintain delivery quality', category: 'product' }
+    ]},
+    { day: 56, actions: [
+      { text: 'Review Week 8 — revenue toward $200K, pipeline quality assessment, delivery capacity check', category: 'strategy' },
+      { text: 'Plan final 30-day push — prioritize deals most likely to close before Day 90', category: 'strategy' },
+      { text: 'Follow up on all Week 8 proposals and conversations', category: 'outreach' }
+    ]},
+
+    // WEEK 9 (Days 57-63, Jun 8-14): Professional Tier Push
+    { day: 57, actions: [
+      { text: 'Close Professional upgrade with Essentials client 1 — $120K/yr contract (target)', category: 'outreach' },
+      { text: 'Send 5 new healthcare cold emails to large health system CHROs', category: 'outreach' },
+      { text: 'Update revenue tracker — calculate gap to $250K goal', category: 'strategy' }
+    ]},
+    { day: 58, actions: [
+      { text: 'Send 5 construction cold emails to untapped geographic regions', category: 'outreach' },
+      { text: 'Deliver 2 assessments for current clients', category: 'product' },
+      { text: 'Begin drafting year-one assessment practice report with cumulative data', category: 'strategy' }
+    ]},
+    { day: 59, actions: [
+      { text: 'Conduct energy sector demo — highlight compliance ROI and case studies', category: 'outreach' },
+      { text: 'Send 5 PE follow-up emails — reference portfolio company assessment results', category: 'outreach' },
+      { text: 'Prepare Essentials proposals for top 3 pipeline prospects ready to close', category: 'product' }
+    ]},
+    { day: 60, actions: [
+      { text: 'Follow up on energy demo with customized proposal and compliance data', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Close new direct Essentials sale (target) — $60K annual contract from cold outreach', category: 'outreach' }
+    ]},
+    { day: 61, actions: [
+      { text: 'Send 5 sports franchise outreach emails — target VP Business Operations and GM', category: 'outreach' },
+      { text: 'Deliver 2 assessments — maintain delivery pace at scale', category: 'product' },
+      { text: 'Update all case studies with cumulative results — 25+ assessments delivered', category: 'strategy' }
+    ]},
+    { day: 62, actions: [
+      { text: 'Follow up on all outstanding proposals — aggressive follow-up on deals near close', category: 'outreach' },
+      { text: 'Send 5 energy nurture emails — share industry insights and assessment trends', category: 'outreach' },
+      { text: 'Plan final 4-week sprint to $250K — identify exactly which deals will close the gap', category: 'strategy' }
+    ]},
+    { day: 63, actions: [
+      { text: 'Review Week 9 — Professional tier closed?, direct Essentials sold?, revenue gap to $250K', category: 'strategy' },
+      { text: 'Follow up on all Week 9 conversations and proposals', category: 'outreach' },
+      { text: 'Adjust strategy based on what is working — double down on best-performing vertical', category: 'strategy' }
+    ]},
+
+    // WEEK 10 (Days 64-70, Jun 15-21): Close the Gap
+    { day: 64, actions: [
+      { text: 'Send 10 outreach emails (construction + healthcare batch) — maximum pipeline refresh', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Request referrals from all happy clients — warm introductions to similar companies', category: 'strategy' }
+    ]},
+    { day: 65, actions: [
+      { text: 'Conduct 2 demos from referral pipeline — warm introductions close faster', category: 'outreach' },
+      { text: 'Send 5 PE operating partner emails — leverage referral network', category: 'outreach' },
+      { text: 'Update all proof points with real client data — turnover reduction, hiring accuracy', category: 'product' }
+    ]},
+    { day: 66, actions: [
+      { text: 'Follow up on referral demos with proposals — expedited timeline for warm introductions', category: 'outreach' },
+      { text: 'Deliver 2 assessments — batch delivery day', category: 'product' },
+      { text: 'Send 5 energy cold emails to new utility and power company targets', category: 'outreach' }
+    ]},
+    { day: 67, actions: [
+      { text: 'Close eighth pilot from referral ($15K) — referral pipeline producing results', category: 'outreach' },
+      { text: 'Send 5 healthcare follow-up emails to warm pipeline prospects', category: 'outreach' },
+      { text: 'Collect fourth testimonial — focus on ROI metrics and business impact', category: 'strategy' }
+    ]},
+    { day: 68, actions: [
+      { text: 'Deliver 2 assessments for current clients', category: 'product' },
+      { text: 'Follow up on all Essentials upgrade conversations — push for decisions this week', category: 'outreach' },
+      { text: 'Update Command Center with latest wins, testimonials, and pipeline changes', category: 'strategy' }
+    ]},
+    { day: 69, actions: [
+      { text: 'Send Essentials proposal to warmest pipeline prospect — customized with their ROI data', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Plan Week 11 closing strategy — identify all deals that can close in next 14 days', category: 'strategy' }
+    ]},
+    { day: 70, actions: [
+      { text: 'Review Week 10 — referral pipeline health, revenue gap remaining, assessment delivery pace', category: 'strategy' },
+      { text: 'Follow up on all outstanding proposals — create urgency with timeline messaging', category: 'outreach' },
+      { text: 'Prepare closing materials for all deals in final stages', category: 'product' }
+    ]},
+
+    // WEEK 11 (Days 71-77, Jun 22-28): Closing Sprint
+    { day: 71, actions: [
+      { text: 'Follow up aggressively on all outstanding proposals — call, do not email, for top 5 deals', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Send 5 new construction emails to maintain pipeline beyond 90-day window', category: 'outreach' }
+    ]},
+    { day: 72, actions: [
+      { text: 'Conduct 2 closing calls — address final objections and negotiate terms', category: 'outreach' },
+      { text: 'Deliver 2 assessments — batch delivery day', category: 'product' },
+      { text: 'Prepare year-end revenue projection for board and investor conversations', category: 'strategy' }
+    ]},
+    { day: 73, actions: [
+      { text: 'Close pending deal (target any tier) — every deal counts in the final sprint', category: 'outreach' },
+      { text: 'Send 5 healthcare outreach emails to maintain vertical pipeline', category: 'outreach' },
+      { text: 'Update all pipeline risk scores — flag deals that need intervention this week', category: 'strategy' }
+    ]},
+    { day: 74, actions: [
+      { text: 'Deliver 2 assessments for current clients', category: 'product' },
+      { text: 'Follow up on all closing calls — send revised proposals if needed', category: 'outreach' },
+      { text: 'Send 5 energy sector follow-up emails — nurture Q3 pipeline', category: 'outreach' }
+    ]},
+    { day: 75, actions: [
+      { text: 'Send 5 sports franchise nurture emails — maintain relationship for Q3 conversion', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Begin drafting Q3 expansion plan — vertical priorities, hiring needs, revenue targets', category: 'strategy' }
+    ]},
+    { day: 76, actions: [
+      { text: 'Follow up on all Week 11 conversations — daily check-ins on closing deals', category: 'outreach' },
+      { text: 'Deliver 2 assessments — maintain delivery quality through closing sprint', category: 'product' },
+      { text: 'Collect fifth testimonial — create testimonial compilation document', category: 'strategy' }
+    ]},
+    { day: 77, actions: [
+      { text: 'Review Week 11 — deals closed, revenue gap, days remaining in 90-day plan', category: 'strategy' },
+      { text: 'Identify all deals that can realistically close in final 13 days', category: 'outreach' },
+      { text: 'Create final push plan with daily targets for remaining days', category: 'strategy' }
+    ]},
+
+    // WEEK 12 (Days 78-84, Jun 29 - Jul 5): Final Push
+    { day: 78, actions: [
+      { text: 'Send personalized "last chance" pilot offers to warmest pipeline — $15K, start immediately', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Update case study library with all completed pilot and Essentials results', category: 'strategy' }
+    ]},
+    { day: 79, actions: [
+      { text: 'Conduct 2 closing demos — final pitch to pipeline prospects on the fence', category: 'outreach' },
+      { text: 'Deliver 2 assessments — maintain delivery through final push', category: 'product' },
+      { text: 'Follow up on all outstanding proposals with deadline urgency', category: 'outreach' }
+    ]},
+    { day: 80, actions: [
+      { text: 'Close any remaining deals to hit $250K — pull out all stops on warmest prospects', category: 'outreach' },
+      { text: 'Send 5 construction follow-up emails — maintain pipeline for Q3', category: 'outreach' },
+      { text: 'Collect final testimonials from recent clients', category: 'strategy' }
+    ]},
+    { day: 81, actions: [
+      { text: 'Deliver 2 assessments for current clients', category: 'product' },
+      { text: 'Prepare 90-day results summary — revenue, assessments delivered, client satisfaction', category: 'strategy' },
+      { text: 'Send 5 healthcare nurture emails — maintain vertical pipeline for Q3', category: 'outreach' }
+    ]},
+    { day: 82, actions: [
+      { text: 'Follow up on all Week 12 conversations — daily urgency on closing deals', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Draft Q3 sales plan — targets by vertical, pipeline goals, hiring timeline', category: 'strategy' }
+    ]},
+    { day: 83, actions: [
+      { text: 'Send thank-you notes to all pilot and Essentials clients — strengthen relationships', category: 'outreach' },
+      { text: 'Deliver final assessments for current pilot clients', category: 'product' },
+      { text: 'Update revenue tracker with all closed and pending deals', category: 'strategy' }
+    ]},
+    { day: 84, actions: [
+      { text: 'Review Week 12 — 90-day revenue total, client satisfaction scores, pipeline for Q3', category: 'strategy' },
+      { text: 'Follow up on any deals still pending from this week', category: 'outreach' },
+      { text: 'Finalize Q3 transition plan and priorities', category: 'product' }
+    ]},
+
+    // WEEK 13 (Days 85-90, Jul 6-11): Wrap & Transition
+    { day: 85, actions: [
+      { text: 'Final revenue accounting — calculate exact 90-day total vs $250K goal', category: 'strategy' },
+      { text: 'Deliver any pending assessments to current clients', category: 'product' },
+      { text: 'Send 5 Q3 pipeline emails — begin building next quarter momentum', category: 'outreach' }
+    ]},
+    { day: 86, actions: [
+      { text: 'Document all processes built in 90 days — sales playbook, assessment workflow, outreach templates', category: 'strategy' },
+      { text: 'Follow up on Q3 pipeline prospects — schedule demos for next week', category: 'outreach' },
+      { text: 'Prepare board update presentation with 90-day results and Q3 projections', category: 'product' }
+    ]},
+    { day: 87, actions: [
+      { text: 'Send Q3 renewal and expansion proposals to all Essentials clients', category: 'outreach' },
+      { text: 'Deliver assessment for current client', category: 'product' },
+      { text: 'Update Command Center with final 90-day data — all metrics, wins, and lessons', category: 'strategy' }
+    ]},
+    { day: 88, actions: [
+      { text: 'Conduct 90-day retrospective — what worked, what did not, what to scale in Q3', category: 'strategy' },
+      { text: 'Follow up on all renewal proposals — begin Q3 contract conversations', category: 'outreach' },
+      { text: 'Identify top 3 process improvements to implement in Q3', category: 'product' }
+    ]},
+    { day: 89, actions: [
+      { text: 'Finalize Q3 sales plan with targets by vertical and monthly milestones', category: 'strategy' },
+      { text: 'Set up Q3 Command Center goals and pipeline targets', category: 'product' },
+      { text: 'Send 5 new outreach emails to kick off Q3 pipeline building', category: 'outreach' }
+    ]},
+    { day: 90, actions: [
+      { text: 'Celebrate 90 days of execution — review the full journey from Day 1 to today', category: 'strategy' },
+      { text: 'Update all metrics and close out 90-day tracking dashboards', category: 'product' },
+      { text: 'Plan Q3 kickoff — set Day 1 of next 90-day sprint', category: 'strategy' }
+    ]}
+  ];
+
+  // ========== DAILY PLAN HELPERS ==========
+  function getDailyPlanDay() {
+    var start = new Date(DAILY_PLAN_START + 'T00:00:00');
+    var now = new Date();
+    now.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    var diff = Math.floor((now - start) / 86400000) + 1;
+    return diff;
+  }
+
+  function getDailyDoneState() {
+    try {
+      var raw = localStorage.getItem('caliber_daily_done');
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  }
+
+  function saveDailyDoneState(state) {
+    localStorage.setItem('caliber_daily_done', JSON.stringify(state));
+  }
+
+  window.toggleDailyAction = function(day, index) {
+    var state = getDailyDoneState();
+    var key = day + '-' + index;
+    state[key] = !state[key];
+    saveDailyDoneState(state);
+    renderToday();
+  };
+
+  function renderDailyPlan() {
+    var dayNum = getDailyPlanDay();
+
+    if (dayNum < 1) {
+      return '<div class="daily-plan-section"><div class="daily-plan-complete">Daily action plan starts April 13, 2026. Get ready!</div></div>';
+    }
+    if (dayNum > 90) {
+      return '<div class="daily-plan-section"><div class="daily-plan-complete">90-day plan complete! Review your results and plan Q3.</div></div>';
+    }
+
+    var entry = DAILY_PLAN.find(function(d) { return d.day === dayNum; });
+    if (!entry) return '';
+
+    var state = getDailyDoneState();
+    var doneCount = 0;
+    entry.actions.forEach(function(a, i) {
+      if (state[dayNum + '-' + i]) doneCount++;
+    });
+
+    var html = '<div class="daily-plan-section">';
+    html += '<div class="daily-plan-header">';
+    html += '<h4>Day ' + dayNum + ' of 90</h4>';
+    html += '<div class="daily-progress">' + doneCount + '/3 complete</div>';
+    html += '</div>';
+
+    entry.actions.forEach(function(a, i) {
+      var key = dayNum + '-' + i;
+      var checked = state[key] ? ' checked' : '';
+      html += '<div class="daily-action">';
+      html += '<input type="checkbox" id="da-' + dayNum + '-' + i + '"' + checked + ' onchange="toggleDailyAction(' + dayNum + ',' + i + ')">';
+      html += '<label for="da-' + dayNum + '-' + i + '">';
+      html += '<span class="da-category ' + a.category + '">' + a.category.toUpperCase() + '</span>';
+      html += a.text;
+      html += '</label>';
+      html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+  }
+
   // ========== ESCAPE HELPER ==========
   function esc(str) {
     if (!str) return '';
@@ -6326,6 +6922,9 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     var todayDateEl = document.getElementById('todayDate');
     if (todayDateEl) todayDateEl.textContent = today;
 
+    // Render daily plan actions first
+    var html = renderDailyPlan();
+
     var priorities = [];
     data.prospects.forEach(function(p) {
       if (['closed_won','closed_lost'].indexOf(p.stage) !== -1) return;
@@ -6359,11 +6958,11 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     });
 
     if (priorities.length === 0) {
-      el.innerHTML = '<div class="today-empty"><span class="today-emoji">✨</span>No priorities for today. Great work!</div>';
+      html += '<div class="today-empty"><span class="today-emoji">✨</span>No priorities for today. Great work!</div>';
+      el.innerHTML = html;
       return;
     }
 
-    var html = '';
     priorities.slice(0, 10).forEach(function(item) {
       var p = item.prospect;
       html += '<div class="priority-card">';
