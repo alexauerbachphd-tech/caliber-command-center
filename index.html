@@ -1436,8 +1436,10 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     </div>
     <a class="sidebar-link" data-tab="prospects"><span class="sl-icon">&#x1F4E7;</span> Prospect DB</a>
   </div>
-  <div class="sidebar-footer">
-    <button class="btn-sm" onclick="exportData()">Export JSON</button>
+  <div class="sidebar-footer" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn-sm" onclick="exportAllData()" title="Download all data as JSON backup">&#x1F4E5; Export</button>
+    <button class="btn-sm" onclick="document.getElementById('importFileInput').click()" title="Restore data from a JSON backup file">&#x1F4E4; Import</button>
+    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportAllData(this)">
   </div>
 </nav>
 
@@ -7804,6 +7806,8 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
   }
 
   // ========== EXPORT / IMPORT / RESET ==========
+
+  // Legacy single-store export (kept for backward compat)
   window.exportData = function() {
     var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
     var url = URL.createObjectURL(blob);
@@ -7816,14 +7820,65 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     URL.revokeObjectURL(url);
   };
 
+  // Full backup: exports ALL localStorage keys used by Command Center
+  window.exportAllData = function() {
+    var backup = {
+      _version: 'caliber-cc-v3-full-backup',
+      _exportedAt: new Date().toISOString(),
+      caliber_cc_v3: localStorage.getItem('caliber_cc_v3'),
+      caliber_daily_done: localStorage.getItem('caliber_daily_done'),
+      caliber_prospect_status: localStorage.getItem('caliber_prospect_status')
+    };
+    var dateStr = new Date().toISOString().slice(0, 10);
+    var blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'caliber-backup-' + dateStr + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Backup downloaded — keep this file safe!');
+  };
+
+  // Full restore: imports ALL localStorage keys
+  window.handleImportAllData = function(input) {
+    if (!input.files || !input.files[0]) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var backup = JSON.parse(e.target.result);
+
+        // Detect full backup vs legacy single-store format
+        if (backup._version === 'caliber-cc-v3-full-backup') {
+          if (!confirm('Restore from backup created ' + (backup._exportedAt || 'unknown date') + '?\\n\\nThis will replace ALL current data. Continue?')) return;
+          if (backup.caliber_cc_v3) localStorage.setItem('caliber_cc_v3', backup.caliber_cc_v3);
+          if (backup.caliber_daily_done) localStorage.setItem('caliber_daily_done', backup.caliber_daily_done);
+          if (backup.caliber_prospect_status) localStorage.setItem('caliber_prospect_status', backup.caliber_prospect_status);
+          location.reload();
+        } else if (backup.prospects) {
+          // Legacy format — just the main data object
+          if (!confirm('Restore dashboard data from legacy backup?\\n\\nThis will replace prospect and checklist data. Continue?')) return;
+          data = backup;
+          saveData();
+          renderAll();
+          showToast('Legacy data restored successfully.');
+        } else {
+          alert('Unrecognized backup format. Make sure you selected a Caliber backup file.');
+        }
+      } catch(err) {
+        alert('Failed to import: ' + err.message);
+      }
+      input.value = '';
+    };
+    reader.readAsText(input.files[0]);
+  };
+
+  // Legacy import (kept for backward compat)
   window.importData = function(json) {
     try {
-      var imported;
-      if (typeof json === 'string') {
-        imported = JSON.parse(json);
-      } else {
-        imported = json;
-      }
+      var imported = (typeof json === 'string') ? JSON.parse(json) : json;
       if (imported && imported.prospects) {
         data = imported;
         saveData();
@@ -7845,6 +7900,16 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     };
     reader.readAsText(input.files[0]);
   };
+
+  // Toast notification helper
+  function showToast(msg) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#4ade80;color:#09090b;padding:12px 24px;border-radius:8px;font-weight:600;font-size:14px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:opacity 0.3s;';
+    document.body.appendChild(t);
+    setTimeout(function() { t.style.opacity = '0'; }, 2500);
+    setTimeout(function() { document.body.removeChild(t); }, 3000);
+  }
 
   window.resetDashboard = function() {
     if (confirm('Are you sure you want to reset ALL dashboard data? This cannot be undone.')) {
