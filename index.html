@@ -685,6 +685,14 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
   font-size: 0.88rem; color: var(--text-body); cursor: pointer;
 }
 .checklist-item.done label { text-decoration: line-through; color: var(--text-muted); }
+.progress-bar-sm {
+  width: 100%; height: 6px; background: rgba(255,255,255,0.08);
+  border-radius: 3px; margin-bottom: 0.75rem; overflow: hidden;
+}
+.progress-fill-sm {
+  height: 100%; background: var(--green); border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* ============================================================
    MODAL
@@ -2072,131 +2080,24 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     <h2>Days 1-30: "Open the Pipeline" — Target: $60,000</h2>
   </div>
 
-  <div class="card mb-2" id="checklist-30">
-    <div class="checklist-phase">
-      <div class="checklist-phase-header">
-        <h4>Days 1-30 Checklist</h4>
-        <span class="pct" id="pct-30">0%</span>
-      </div>
-      <div class="checklist-item" data-key="c30-1">
-        <input type="checkbox" id="c30-1">
-        <label for="c30-1">Finalize assessment delivery workflow (48-hour turnaround)</label>
-      </div>
-      <div class="checklist-item" data-key="c30-2">
-        <input type="checkbox" id="c30-2">
-        <label for="c30-2">Set up CRM/pipeline tracking</label>
-      </div>
-      <div class="checklist-item" data-key="c30-3">
-        <input type="checkbox" id="c30-3">
-        <label for="c30-3">Launch outreach to warm network (target: 50 contacts)</label>
-      </div>
-      <div class="checklist-item" data-key="c30-4">
-        <input type="checkbox" id="c30-4">
-        <label for="c30-4">Close 4 pilot engagements at $15K each</label>
-      </div>
-      <div class="checklist-item" data-key="c30-5">
-        <input type="checkbox" id="c30-5">
-        <label for="c30-5">Deliver first 3 assessment reports</label>
-      </div>
-      <div class="checklist-item" data-key="c30-6">
-        <input type="checkbox" id="c30-6">
-        <label for="c30-6">Collect 2 testimonials from pilot clients</label>
-      </div>
-      <div class="checklist-item" data-key="c30-7">
-        <input type="checkbox" id="c30-7">
-        <label for="c30-7">Schedule 10 demos</label>
-      </div>
-    </div>
+  <div id="checklistContainer">
+    <!-- Dynamically rendered by renderChecklist() -->
   </div>
 </div>
 
-<!-- Days 31-60 Checklist -->
+<!-- Days 31-60 -->
 <div class="section" id="plan-60">
   <div class="section-header">
     <div class="section-icon">&#9313;</div>
     <h2>Days 31-60: "Convert and Expand" — Target: $100,000</h2>
   </div>
-
-  <div class="card mb-2" id="checklist-60">
-    <div class="checklist-phase">
-      <div class="checklist-phase-header">
-        <h4>Days 31-60 Checklist</h4>
-        <span class="pct" id="pct-60">0%</span>
-      </div>
-      <div class="checklist-item" data-key="c60-1">
-        <input type="checkbox" id="c60-1">
-        <label for="c60-1">Convert 2 pilot clients to Essentials ($60K/yr each)</label>
-      </div>
-      <div class="checklist-item" data-key="c60-2">
-        <input type="checkbox" id="c60-2">
-        <label for="c60-2">Close 2 new pilot engagements</label>
-      </div>
-      <div class="checklist-item" data-key="c60-3">
-        <input type="checkbox" id="c60-3">
-        <label for="c60-3">Launch cold outreach to construction + healthcare targets</label>
-      </div>
-      <div class="checklist-item" data-key="c60-4">
-        <input type="checkbox" id="c60-4">
-        <label for="c60-4">Deliver 10 cumulative assessments</label>
-      </div>
-      <div class="checklist-item" data-key="c60-5">
-        <input type="checkbox" id="c60-5">
-        <label for="c60-5">Build 3 case studies from pilot results</label>
-      </div>
-      <div class="checklist-item" data-key="c60-6">
-        <input type="checkbox" id="c60-6">
-        <label for="c60-6">Begin PE outreach (operating partners)</label>
-      </div>
-      <div class="checklist-item" data-key="c60-7">
-        <input type="checkbox" id="c60-7">
-        <label for="c60-7">Schedule 15 cumulative demos</label>
-      </div>
-    </div>
-  </div>
 </div>
 
-<!-- Days 61-90 Checklist -->
+<!-- Days 61-90 -->
 <div class="section" id="plan-90">
   <div class="section-header">
     <div class="section-icon">&#9314;</div>
     <h2>Days 61-90: "Scale to Target" — Target: $90,000</h2>
-  </div>
-
-  <div class="card mb-2" id="checklist-90">
-    <div class="checklist-phase">
-      <div class="checklist-phase-header">
-        <h4>Days 61-90 Checklist</h4>
-        <span class="pct" id="pct-90">0%</span>
-      </div>
-      <div class="checklist-item" data-key="c90-1">
-        <input type="checkbox" id="c90-1">
-        <label for="c90-1">Upgrade 1 Essentials client to Professional ($120K/yr)</label>
-      </div>
-      <div class="checklist-item" data-key="c90-2">
-        <input type="checkbox" id="c90-2">
-        <label for="c90-2">Close 1 new Essentials direct sale</label>
-      </div>
-      <div class="checklist-item" data-key="c90-3">
-        <input type="checkbox" id="c90-3">
-        <label for="c90-3">Launch energy vertical outreach</label>
-      </div>
-      <div class="checklist-item" data-key="c90-4">
-        <input type="checkbox" id="c90-4">
-        <label for="c90-4">Deliver 25 cumulative assessments</label>
-      </div>
-      <div class="checklist-item" data-key="c90-5">
-        <input type="checkbox" id="c90-5">
-        <label for="c90-5">Establish 2 PE operating partner relationships</label>
-      </div>
-      <div class="checklist-item" data-key="c90-6">
-        <input type="checkbox" id="c90-6">
-        <label for="c90-6">Finalize year-one pricing and contract templates</label>
-      </div>
-      <div class="checklist-item" data-key="c90-7">
-        <input type="checkbox" id="c90-7">
-        <label for="c90-7">Hit $250K cumulative revenue target</label>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -7345,6 +7246,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     data.checklist[key] = !data.checklist[key];
     saveData();
     renderChecklist();
+    updateDashboard();
   };
 
   // ========== EMAIL SEQUENCE BUILDER ==========
