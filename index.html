@@ -4534,7 +4534,10 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
       </div>
       <div style="display:flex;gap:8px;">
         <button type="submit" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Sign In</button>
-        <button type="button" onclick="closeSyncLogin()" style="flex:1;padding:10px;background:var(--surface-alt,var(--surface));color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Cancel</button>
+        <button type="button" onclick="handleSyncSignup()" style="flex:1;padding:10px;background:var(--surface-alt,var(--surface));color:var(--text);border:1px solid var(--border);border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Create Account</button>
+      </div>
+      <div style="text-align:center;margin-top:10px;">
+        <button type="button" onclick="closeSyncLogin()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.8rem;text-decoration:underline;">Cancel</button>
       </div>
     </form>
     <div id="syncLoggedIn" style="display:none;text-align:center;">
@@ -8501,6 +8504,57 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     ts[key] = Date.now();
     localStorage.setItem(tsKey, JSON.stringify(ts));
   }
+
+  // Sign up a new user
+  function handleSyncSignup() {
+    if (!sbClient) { alert('Supabase not loaded. Check your connection.'); return; }
+
+    var email = document.getElementById('syncEmail').value;
+    var password = document.getElementById('syncPassword').value;
+    var errorDiv = document.getElementById('syncLoginError');
+    errorDiv.style.display = 'none';
+
+    if (!email || !password) {
+      errorDiv.textContent = 'Please enter email and password.';
+      errorDiv.style.display = 'block';
+      return;
+    }
+    if (password.length < 6) {
+      errorDiv.textContent = 'Password must be at least 6 characters.';
+      errorDiv.style.display = 'block';
+      return;
+    }
+
+    sbClient.auth.signUp({ email: email, password: password })
+      .then(function(result) {
+        if (result.error) {
+          errorDiv.textContent = result.error.message;
+          errorDiv.style.display = 'block';
+          return;
+        }
+        if (result.data.session) {
+          syncSession = result.data.session;
+          closeSyncLogin();
+          updateSyncButton(true);
+          syncNow();
+        } else {
+          errorDiv.textContent = 'Account created! Check your email to confirm, then sign in.';
+          errorDiv.style.display = 'block';
+          errorDiv.style.background = '#f0fdf4';
+          errorDiv.style.borderColor = '#86efac';
+          errorDiv.style.color = '#166534';
+        }
+      });
+  }
+
+  // Expose sync functions to global scope (needed because we're inside an IIFE)
+  window.syncNow = syncNow;
+  window.showSyncLogin = showSyncLogin;
+  window.closeSyncLogin = closeSyncLogin;
+  window.handleSyncLogin = handleSyncLogin;
+  window.handleSyncLogout = handleSyncLogout;
+  window.handleSyncSignup = handleSyncSignup;
+  window.markLocalUpdated = markLocalUpdated;
 
   // ========== INITIALIZATION ==========
   document.addEventListener('DOMContentLoaded', function() {
