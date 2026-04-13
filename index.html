@@ -1502,6 +1502,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
   color: var(--text-muted); font-size: 0.9rem;
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -1543,6 +1544,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
   </div>
   <div class="sidebar-footer" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
     <button class="btn-sm" id="themeToggle" onclick="cycleTheme()" title="Toggle theme">Auto</button>
+    <button class="btn-sm" id="syncBtn" onclick="syncNow()" title="Sync data to cloud">&#x2601; Sync</button>
     <button class="btn-sm" onclick="exportAllData()" title="Download all data as JSON backup">&#x1F4E5; Export</button>
     <button class="btn-sm" onclick="document.getElementById('importFileInput').click()" title="Restore data from a JSON backup file">&#x1F4E4; Import</button>
     <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportAllData(this)">
@@ -4514,6 +4516,38 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
 </div>
 
 <!-- ============================================================
+     MODAL: SYNC LOGIN
+============================================================ -->
+<div class="modal-overlay" id="syncLoginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;max-width:360px;width:90%;margin:auto;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+    <h3 style="margin:0 0 8px;font-family:'Vollkorn',serif;color:var(--text);">Cloud Sync</h3>
+    <p style="margin:0 0 20px;font-size:0.85rem;color:var(--text-muted);">Sign in to sync your data across devices.</p>
+    <div id="syncLoginError" style="display:none;background:var(--danger-bg,#fef2f2);border:1px solid var(--danger-border,#fca5a5);color:var(--danger-text,#dc2626);padding:8px 12px;border-radius:6px;font-size:0.8rem;margin-bottom:12px;"></div>
+    <form id="syncLoginForm" onsubmit="return handleSyncLogin(event)">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;">Email</label>
+        <input type="email" id="syncEmail" required style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.9rem;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:0.75rem;font-weight:600;color:var(--text-muted);margin-bottom:4px;">Password</label>
+        <input type="password" id="syncPassword" required style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.9rem;box-sizing:border-box;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Sign In</button>
+        <button type="button" onclick="closeSyncLogin()" style="flex:1;padding:10px;background:var(--surface-alt,var(--surface));color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Cancel</button>
+      </div>
+    </form>
+    <div id="syncLoggedIn" style="display:none;text-align:center;">
+      <p style="margin:0 0 8px;font-size:0.85rem;color:var(--text);">Signed in as <strong id="syncUserEmail"></strong></p>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button onclick="syncNow()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Sync Now</button>
+        <button onclick="handleSyncLogout()" style="padding:10px 20px;background:var(--surface-alt,var(--surface));color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-weight:600;cursor:pointer;font-size:0.85rem;">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      MODAL: ADD/EDIT PROSPECT
 ============================================================ -->
 <div class="modal-overlay" id="modalOverlay">
@@ -5710,6 +5744,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
   function saveData(d) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(d || data));
+      if (typeof markLocalUpdated === 'function') markLocalUpdated('caliber_cc_v3');
     } catch(e) { console.warn('Failed to save data:', e); }
   }
 
@@ -6286,6 +6321,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
 
   function saveDailyDoneState(state) {
     localStorage.setItem('caliber_daily_done', JSON.stringify(state));
+    if (typeof markLocalUpdated === 'function') markLocalUpdated('caliber_daily_done');
   }
 
   window.toggleDailyAction = function(day, index) {
@@ -7842,6 +7878,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
 
   function saveNotes(notes) {
     localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+    if (typeof markLocalUpdated === 'function') markLocalUpdated('caliber_notes');
   }
 
   function escNote(s) {
@@ -8248,10 +8285,230 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     });
   }
 
+  // ========== SUPABASE CLOUD SYNC ==========
+  var SUPABASE_URL = 'https://yzltqefyluikukphirmh.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6bHRxZWZ5bHVpa3VrcGhpcm1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTIzMTEsImV4cCI6MjA5MTY4ODMxMX0.-Nq_zQYRNP_GMWgR2GiqKmRlgcdRyJCU9ZQYe9AhMdo';
+  var SYNC_KEYS = ['caliber_cc_v3', 'caliber_daily_done', 'caliber_prospect_status', 'caliber_notes'];
+
+  var sbClient = null;
+  var syncSession = null;
+
+  function initSupabase() {
+    if (window.supabase && window.supabase.createClient) {
+      sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      // Check for existing session
+      sbClient.auth.getSession().then(function(result) {
+        if (result.data && result.data.session) {
+          syncSession = result.data.session;
+          updateSyncButton(true);
+        }
+      });
+      // Listen for auth changes
+      sbClient.auth.onAuthStateChange(function(event, session) {
+        syncSession = session;
+        updateSyncButton(!!session);
+      });
+    }
+  }
+
+  function updateSyncButton(loggedIn) {
+    var btn = document.getElementById('syncBtn');
+    if (!btn) return;
+    if (loggedIn) {
+      btn.innerHTML = '&#x2601; Sync';
+      btn.title = 'Sync data to cloud (signed in)';
+      btn.style.opacity = '1';
+    } else {
+      btn.innerHTML = '&#x2601; Sync';
+      btn.title = 'Sign in to sync data';
+      btn.style.opacity = '0.7';
+    }
+  }
+
+  function showSyncLogin() {
+    var overlay = document.getElementById('syncLoginOverlay');
+    var form = document.getElementById('syncLoginForm');
+    var loggedInDiv = document.getElementById('syncLoggedIn');
+    var errorDiv = document.getElementById('syncLoginError');
+    errorDiv.style.display = 'none';
+
+    if (syncSession) {
+      form.style.display = 'none';
+      loggedInDiv.style.display = 'block';
+      document.getElementById('syncUserEmail').textContent = syncSession.user.email;
+    } else {
+      form.style.display = 'block';
+      loggedInDiv.style.display = 'none';
+    }
+    overlay.style.display = 'flex';
+  }
+
+  function closeSyncLogin() {
+    document.getElementById('syncLoginOverlay').style.display = 'none';
+  }
+
+  function handleSyncLogin(e) {
+    e.preventDefault();
+    if (!sbClient) { alert('Supabase not loaded. Check your connection.'); return false; }
+
+    var email = document.getElementById('syncEmail').value;
+    var password = document.getElementById('syncPassword').value;
+    var errorDiv = document.getElementById('syncLoginError');
+    errorDiv.style.display = 'none';
+
+    sbClient.auth.signInWithPassword({ email: email, password: password })
+      .then(function(result) {
+        if (result.error) {
+          errorDiv.textContent = result.error.message;
+          errorDiv.style.display = 'block';
+          return;
+        }
+        syncSession = result.data.session;
+        closeSyncLogin();
+        updateSyncButton(true);
+        // Auto-sync after login
+        syncNow();
+      });
+    return false;
+  }
+
+  function handleSyncLogout() {
+    if (!sbClient) return;
+    sbClient.auth.signOut().then(function() {
+      syncSession = null;
+      updateSyncButton(false);
+      closeSyncLogin();
+      showSyncStatus('Signed out');
+    });
+  }
+
+  function showSyncStatus(msg) {
+    var btn = document.getElementById('syncBtn');
+    if (!btn) return;
+    var orig = btn.innerHTML;
+    btn.innerHTML = msg;
+    setTimeout(function() { btn.innerHTML = orig; }, 2000);
+  }
+
+  function syncNow() {
+    // If not logged in, show login modal
+    if (!sbClient || !syncSession) {
+      showSyncLogin();
+      return;
+    }
+
+    var btn = document.getElementById('syncBtn');
+    if (btn) btn.innerHTML = '&#x21BB; Syncing...';
+
+    var userId = syncSession.user.id;
+
+    // Pull cloud data first, then push local if newer
+    sbClient
+      .from('cc_sync')
+      .select('store_key, store_value, updated_at')
+      .eq('user_id', userId)
+      .then(function(result) {
+        if (result.error) {
+          showSyncStatus('&#x26A0; Error');
+          console.error('Sync pull error:', result.error);
+          return;
+        }
+
+        var cloudData = {};
+        (result.data || []).forEach(function(row) {
+          cloudData[row.store_key] = row;
+        });
+
+        // For each key, compare local vs cloud and resolve
+        var localTimestampKey = 'caliber_sync_timestamps';
+        var localTimestamps = {};
+        try { localTimestamps = JSON.parse(localStorage.getItem(localTimestampKey) || '{}'); } catch(e) {}
+
+        var upserts = [];
+        var pullCount = 0;
+        var pushCount = 0;
+
+        SYNC_KEYS.forEach(function(key) {
+          var localVal = localStorage.getItem(key);
+          var localTs = localTimestamps[key] || 0;
+          var cloudRow = cloudData[key];
+
+          if (cloudRow) {
+            var cloudTs = new Date(cloudRow.updated_at).getTime();
+            if (cloudTs > localTs && cloudRow.store_value !== localVal) {
+              // Cloud is newer — pull
+              localStorage.setItem(key, cloudRow.store_value || '');
+              localTimestamps[key] = cloudTs;
+              pullCount++;
+            } else if (localVal !== null && (localTs > cloudTs || cloudRow.store_value !== localVal)) {
+              // Local is newer or different — push
+              var now = new Date().toISOString();
+              upserts.push({
+                user_id: userId,
+                store_key: key,
+                store_value: localVal,
+                updated_at: now
+              });
+              localTimestamps[key] = new Date(now).getTime();
+              pushCount++;
+            }
+          } else if (localVal !== null) {
+            // No cloud data — push local
+            var now = new Date().toISOString();
+            upserts.push({
+              user_id: userId,
+              store_key: key,
+              store_value: localVal,
+              updated_at: now
+            });
+            localTimestamps[key] = new Date(now).getTime();
+            pushCount++;
+          }
+        });
+
+        localStorage.setItem(localTimestampKey, JSON.stringify(localTimestamps));
+
+        if (pullCount > 0) {
+          // Reload UI with pulled data
+          renderAll();
+        }
+
+        if (upserts.length > 0) {
+          sbClient
+            .from('cc_sync')
+            .upsert(upserts, { onConflict: 'user_id,store_key' })
+            .then(function(upsertResult) {
+              if (upsertResult.error) {
+                showSyncStatus('&#x26A0; Error');
+                console.error('Sync push error:', upsertResult.error);
+              } else {
+                showSyncStatus('&#x2601; Synced &#x2713;');
+                console.log('Sync complete: pushed ' + pushCount + ', pulled ' + pullCount);
+              }
+            });
+        } else {
+          showSyncStatus('&#x2601; Synced &#x2713;');
+          console.log('Sync complete: pushed ' + pushCount + ', pulled ' + pullCount);
+        }
+      });
+  }
+
+  // Mark local data as updated when saving
+  function markLocalUpdated(key) {
+    var tsKey = 'caliber_sync_timestamps';
+    var ts = {};
+    try { ts = JSON.parse(localStorage.getItem(tsKey) || '{}'); } catch(e) {}
+    ts[key] = Date.now();
+    localStorage.setItem(tsKey, JSON.stringify(ts));
+  }
+
   // ========== INITIALIZATION ==========
   document.addEventListener('DOMContentLoaded', function() {
     // Render everything
     renderAll();
+
+    // Initialize Supabase sync
+    initSupabase();
 
     // Setup interactive features
     setupStartDate();
@@ -8296,6 +8553,7 @@ td.money { text-align: right; font-variant-numeric: tabular-nums; color: var(--s
     var s = getProspectStatuses();
     s[company] = status;
     localStorage.setItem(PROSPECT_STATUS_KEY, JSON.stringify(s));
+    if (typeof markLocalUpdated === 'function') markLocalUpdated('caliber_prospect_status');
   }
   function getStatus(prospect) {
     var saved = getProspectStatuses();
